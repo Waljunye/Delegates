@@ -1,84 +1,34 @@
+using System;
 using System.Collections.Generic;
-using Animations;
-using Pooling;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Entry : MonoBehaviour
 {
-    [SerializeField]
-    private Sprite imageSprite;
-    
-    [SerializeField]
-    private GameObject prefab;
     private void Start()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if (canvas == null)
+        IEnumerable<int> randomList = new List<int>();
+
+        for (int i = 0; i < 100; i++)
         {
-            GameObject canvasGO = new GameObject("Canvas");
-            canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGO.AddComponent<CanvasScaler>();
-            canvasGO.AddComponent<GraphicRaycaster>();
-        }
-
-        GameObject imageGO = new GameObject("DynamicImage");
-        imageGO.transform.SetParent(canvas.transform);
-
-        Image image = imageGO.AddComponent<Image>();
-
-        if (imageSprite != null)
-        {
-            image.sprite = imageSprite;
-        }
-
-        RectTransform rectTransform = image.GetComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(200, 200);
-        rectTransform.anchoredPosition = Vector2.zero;
-        UiAnimations.OnAnimationFinished += (elapsed) =>
-        {
-            Debug.Log($"\"Sosal\" disappeared, elapsed: {elapsed}");
-        };
-        StartCoroutine(UiAnimations.AnimateFadeOut(image, 2.0f));
-
-        ObjectPool<GameObject> pool = new ObjectPool<GameObject>(10, 5, InitializePooledObject,
-            GetPooledObject,
-            DeinitializePooledObject, DestroyPooledGameObject);
-
-        List<GameObject> a = new List<GameObject>();
-        
-        for (int i = 0; i < 10; i++)
-        {
-            a.Add(pool.Get());
-        }
-        var outOfLimit = pool.Get();
-        foreach (var po in a)
-        {
-            pool.Deinitialize(po);
+            randomList = randomList.Append(Random.Range(0, 100));
         }
         
-        pool.Deinitialize(outOfLimit);
-    }
+        // Greater Than 10
+        var greaterThanTen = randomList.Where(x => x > 10);
+        var hasDivisibleByFive = randomList.Any(x => x % 5 == 0);
+        var hasGreaterThan0 = randomList.Any(x => x > 0);
+        var allIsPositive = randomList.All(x => x > 0);
+        var arr = randomList.ToArray();
+        var list = randomList.ToList();
 
-    private GameObject InitializePooledObject()
-    {
-        return Instantiate(prefab);
-    }
-
-    private GameObject GetPooledObject(GameObject pooledObject)
-    {
-        pooledObject.SetActive(true);
-        return pooledObject;
-    }
-
-    private void DeinitializePooledObject(GameObject pooledObject)
-    {
-        pooledObject.SetActive(false);
-    }
-
-    private void DestroyPooledGameObject(GameObject pooledObject)
-    {
-        Destroy(pooledObject);
+        Debug.Log($"greater than ten: {String.Join(" ", greaterThanTen)}");
+        Debug.Log($"has divisible by 5: {hasDivisibleByFive}");
+        Debug.Log($"has greater than 0: {hasGreaterThan0}");
+        Debug.Log($"all is positive: {allIsPositive}");
+        Debug.Log($"array: {String.Join(" ", arr)}");
+        Debug.Log($"list: {String.Join(" ", list)}");
     }
 }
+
