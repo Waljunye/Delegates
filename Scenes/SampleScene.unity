@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageSprite: {fileID: 21300000, guid: 4c8504d41f56e4850872c77a9b19b559, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 4403348795227924648, guid: f50fe59eaedb0452dac69ef367ae712e, type: 3}
 --- !u!4 &9685155
 Transform:
   m_ObjectHideFlags: 0
