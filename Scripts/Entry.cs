@@ -55,10 +55,10 @@ public class Entry : MonoBehaviour
         var outOfLimit = pool.Get();
         foreach (var po in a)
         {
-            pool.Deinitialize(po);
+            pool.Release(po);
         }
         
-        pool.Deinitialize(outOfLimit);
+        pool.Release(outOfLimit);
     }
 
     private GameObject InitializePooledObject()
