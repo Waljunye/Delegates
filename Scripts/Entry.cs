@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Animations;
 using Pooling;
@@ -59,6 +60,8 @@ public class Entry : MonoBehaviour
         }
         
         pool.Release(outOfLimit);
+        
+        StartCoroutine(TestClear(pool));
     }
 
     private GameObject InitializePooledObject()
@@ -80,5 +83,12 @@ public class Entry : MonoBehaviour
     private void DestroyPooledGameObject(GameObject pooledObject)
     {
         Destroy(pooledObject);
+    }
+
+    private IEnumerator TestClear<T>(ObjectPool<T> pool)
+    {
+        yield return new WaitForSeconds(5.0f);
+        
+        pool.Clear();
     }
 }

@@ -74,8 +74,15 @@ namespace Pooling
                 return _onTakeFromPool(_poolQueue.Dequeue());
             }
             
-            
             return _poolQueue.Dequeue();
+        }
+
+        public void Clear()
+        {
+            while (_poolQueue.Count > 0)
+            {
+                _onDestroyObject(_poolQueue.Dequeue());
+            }
         }
     }
 }
