@@ -12,7 +12,7 @@ public class Entry : MonoBehaviour
     
     [SerializeField]
     private GameObject prefab;
-    private void Start()
+    private IEnumerator Start()
     {
         Canvas canvas = FindObjectOfType<Canvas>();
         if (canvas == null)
@@ -37,12 +37,17 @@ public class Entry : MonoBehaviour
         RectTransform rectTransform = image.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(200, 200);
         rectTransform.anchoredPosition = Vector2.zero;
-        UiAnimations.OnAnimationFinished += (elapsed) =>
-        {
-            Debug.Log($"\"Sosal\" disappeared, elapsed: {elapsed}");
-        };
-        StartCoroutine(UiAnimations.AnimateFadeOut(image, 2.0f));
-
+        
+        
+        yield return TestImageDisappearAnonDelegate(image);
+        yield return new WaitForSeconds(2.0f);
+        var clr = image.color;
+        clr.a = 1.0f;
+        image.color = clr;
+        
+        yield return TestImageDisappearNamedDelegate(image);
+        
+        
         ObjectPool<GameObject> pool = new ObjectPool<GameObject>(10, 5, InitializePooledObject,
             GetPooledObject,
             DeinitializePooledObject, DestroyPooledGameObject);
@@ -90,5 +95,23 @@ public class Entry : MonoBehaviour
         yield return new WaitForSeconds(5.0f);
         
         pool.Clear();
+    }
+
+    private IEnumerator TestImageDisappearAnonDelegate(Image image)
+    {
+        yield return UiAnimations.AnimateFadeOut(image, 2.0f, (elapsed) =>
+        {
+            Debug.Log($"\"Sosal\" disappeared, elapsed: {elapsed}");
+        });
+    }
+
+    private IEnumerator TestImageDisappearNamedDelegate(Image image)
+    {
+        yield return UiAnimations.AnimateFadeOut(image, 2.0f, ActionOnDisappear);
+    }
+
+    private void ActionOnDisappear(float elapsed)
+    {
+        Debug.Log($"\"Sosal\" disappeared, elapsed: {elapsed}, но по-другому)))");
     }
 }

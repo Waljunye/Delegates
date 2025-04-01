@@ -13,16 +13,16 @@ namespace Pooling
         public delegate void OnDestroyObject(T obj);
         
         private readonly CreatePooledItem _createObject;
-        private readonly OnReturnedInPool _onReturnedInPool;
-        private readonly OnDestroyObject _onDestroyObject;
-        private readonly OnTakeFromPool _onTakeFromPool;
+        private readonly OnReturnedInPool _ActionOnReturnedInPool;
+        private readonly OnDestroyObject _ActionOnDestroyObject;
+        private readonly OnTakeFromPool _ActionOnTakeFromPool;
         
-        public ObjectPool(int capacity, int length, CreatePooledItem createObject, OnTakeFromPool onTakeFromPool,  OnReturnedInPool onReturnedInPool, OnDestroyObject onDestroyObject)
+        public ObjectPool(int capacity, int length, CreatePooledItem createObject, OnTakeFromPool actionOnTakeFromPool,  OnReturnedInPool actionOnReturnedInPool, OnDestroyObject actionOnDestroyObject)
         {
             _createObject = createObject ?? throw new System.ArgumentNullException(nameof(createObject));
-            _onReturnedInPool = onReturnedInPool;
-            _onDestroyObject = onDestroyObject;
-            _onTakeFromPool = onTakeFromPool;
+            _ActionOnReturnedInPool = actionOnReturnedInPool;
+            _ActionOnDestroyObject = actionOnDestroyObject;
+            _ActionOnTakeFromPool = actionOnTakeFromPool;
 
             if (capacity < length)
             {
@@ -44,19 +44,19 @@ namespace Pooling
             if (_poolQueue.Count < _capacity)
             {
                 Debug.Log($"Deinitializing: {_poolQueue.Count}");
-                if (_onDestroyObject != null)
+                if (_ActionOnDestroyObject != null)
                 {
-                    _onReturnedInPool(obj);
+                    _ActionOnReturnedInPool(obj);
                 }
                 _poolQueue.Enqueue(obj);
             }
             
-            else if (_poolQueue.Count >= _capacity)
+            else 
             {
                 Debug.Log($"Destroying: {_poolQueue.Count}");
-                if (_onDestroyObject != null)
+                if (_ActionOnDestroyObject != null)
                 {
-                    _onDestroyObject(obj);
+                    _ActionOnDestroyObject(obj);
                 }
             }
         }
@@ -66,12 +66,12 @@ namespace Pooling
             if (_poolQueue.Count == 0)
             {
                 var obj =  _createObject();
-                return _onTakeFromPool(obj);
+                return _ActionOnTakeFromPool(obj);
             }
 
-            if (_onTakeFromPool != null)
+            if (_ActionOnTakeFromPool != null)
             {
-                return _onTakeFromPool(_poolQueue.Dequeue());
+                return _ActionOnTakeFromPool(_poolQueue.Dequeue());
             }
             
             return _poolQueue.Dequeue();
@@ -81,8 +81,9 @@ namespace Pooling
         {
             while (_poolQueue.Count > 0)
             {
-                _onDestroyObject(_poolQueue.Dequeue());
+                _ActionOnDestroyObject(_poolQueue.Dequeue());
             }
+            _poolQueue.Clear();
         }
     }
 }

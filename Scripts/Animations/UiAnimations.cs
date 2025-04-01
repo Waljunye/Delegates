@@ -7,9 +7,8 @@ namespace Animations
 {
     public static class UiAnimations
     {
-        public static event Action<float> OnAnimationFinished;
         
-        public static IEnumerator AnimateFadeOut(Image image, float duration = 1.0f)
+        public static IEnumerator AnimateFadeOut(Image image, float duration = 1.0f, Action<float> onAnimationFinished = null)
         {
             float elapsed = 0.0f;
             while (elapsed < duration)
@@ -20,7 +19,7 @@ namespace Animations
                 image.color = currentColor;
                 yield return null;
             }
-            OnAnimationFinished?.Invoke(elapsed);
+            onAnimationFinished?.Invoke(elapsed);
             Color endColor = image.color;
             endColor.a = 0.0f;
             image.color = endColor;
